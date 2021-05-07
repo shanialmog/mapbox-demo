@@ -68,8 +68,16 @@ input[type=submit]:active, button:active {
   justify-content: flex-end;
 }
 
-.mapboxgl-marker.active {
-  background-color: red;
+.mapboxgl-marker .active-marker {
+  display: none;
+}
+
+.mapboxgl-marker.active .default-marker{
+  display: none;
+}
+
+.mapboxgl-marker.active .active-marker{
+  display: block;
 }
 
 

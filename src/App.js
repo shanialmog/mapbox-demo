@@ -5,7 +5,9 @@ import mockRoute from './mocks/mockRouteGPX'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 import './App.css'
-import ActiveMarkerIcon from './asset/ActiveMarkerIcon'
+// import ActiveMarkerIcon from '../asset/ActiveMarkerIcon.svg'
+// import MarkerIcon from '../asset/MarkerIcon.svg'
+
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhbmlhbCIsImEiOiJja255ZGNzeDUxZmNjMm9vYW5sMHJlOGl4In0.4jYO29I1bJmuCg8FxL1rKw'
 
@@ -26,8 +28,19 @@ const App = () => {
       zoom: 14
     })
 
+
     map.on('click', function (e) {
-      const marker = new mapboxgl.Marker()
+      const markerEl = document.createElement('div')
+      const svgEl1 = document.createElement('img')
+      const svgEl2 = document.createElement('img')
+      svgEl1.classList.add('default-marker')
+      svgEl2.classList.add('active-marker')
+      svgEl1.src = '/asset/MarkerIcon.svg'
+      svgEl2.src = '/asset/ActiveMarkerIcon.svg'
+      markerEl.appendChild(svgEl1)
+      markerEl.appendChild(svgEl2)
+  
+      const marker = new mapboxgl.Marker({ element: markerEl })
         .setLngLat([e.lngLat.lng, e.lngLat.lat])
         .addTo(map)
       const markerElement = marker.getElement()
