@@ -5,9 +5,6 @@ import mockRoute from './mocks/mockRouteGPX'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 import './App.css'
-// import ActiveMarkerIcon from '../asset/ActiveMarkerIcon.svg'
-// import MarkerIcon from '../asset/MarkerIcon.svg'
-
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhbmlhbCIsImEiOiJja255ZGNzeDUxZmNjMm9vYW5sMHJlOGl4In0.4jYO29I1bJmuCg8FxL1rKw'
 
@@ -35,8 +32,8 @@ const App = () => {
       const svgEl2 = document.createElement('img')
       svgEl1.classList.add('default-marker')
       svgEl2.classList.add('active-marker')
-      svgEl1.src = '/asset/MarkerIcon.svg'
-      svgEl2.src = '/asset/ActiveMarkerIcon.svg'
+      svgEl1.src = '/assets/MarkerIcon.svg'
+      svgEl2.src = '/assets/ActiveMarkerIcon.svg'
       markerEl.appendChild(svgEl1)
       markerEl.appendChild(svgEl2)
   
