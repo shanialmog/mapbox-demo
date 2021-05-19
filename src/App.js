@@ -34,7 +34,7 @@ const App = () => {
       svgEl2.src = '/assets/ActiveMarkerIcon.svg'
       markerEl.appendChild(svgEl1)
       markerEl.appendChild(svgEl2)
-  
+
       const marker = new mapboxgl.Marker({ element: markerEl })
         .setLngLat([e.lngLat.lng, e.lngLat.lat])
         .addTo(map)
@@ -126,14 +126,16 @@ const App = () => {
     // Get points on map to create a line
   }
 
+  const createMarker = () => {
+    // Get points on map to create a line
+  }
+
   return (
     <div className='container'>
       <h1>Build your personal route</h1>
       <div>
-        {
-          !isRouteLoaded &&
-          <button onClick={createRoute}>CREATE ROUTE</button>
-        }
+        <button onClick={createMarker}>MARKER</button>
+        <button onClick={createRoute}>ROUTE</button>
         <div id='map'></div>
         <div className='form-container'>
           {
