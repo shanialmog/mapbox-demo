@@ -1,7 +1,5 @@
 import mapboxgl from 'mapbox-gl'
 import { useEffect, useState } from 'react'
-import mockRoute from './mocks/mockRouteGPX'
-// import mockRoute from './mocks/mockRoute'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 import './App.css'
@@ -44,7 +42,9 @@ const App = () => {
       markerElement.addEventListener('click', (e) => {
         // Prevent map click event from triggering
         e.stopPropagation()
-        const markerId = e.target.parentNode.parentNode.parentNode.parentNode.getAttribute('data-id')
+        const markerId = e.target.parentNode.getAttribute('data-id')
+        console.log(markerId)
+        console.log(e.target)
         setActiveMarkerId(markerId)
       })
       const markerId = '' + Math.round(Math.random() * 1000) // Save markerId as string for setAttribute
@@ -122,24 +122,8 @@ const App = () => {
     })
   }
 
-  const loadRoute = () => {
-    setIsRouteLoaded(true)
-    // TODO Get data from user
-    map.addSource('route', mockRoute)
-    map.addLayer({
-      'id': 'route',
-      'type': 'line',
-      'source': 'route',
-      'layout': {
-        'line-join': 'round',
-        'line-cap': 'round'
-      },
-      'paint': {
-        'line-color': '#888',
-        'line-width': 8
-      }
-    })
-    map.setCenter(mockRoute.data.geometry.coordinates[0])
+  const createRoute = () => {
+    // Get points on map to create a line
   }
 
   return (
@@ -148,7 +132,7 @@ const App = () => {
       <div>
         {
           !isRouteLoaded &&
-          <button onClick={loadRoute}>LOAD ROUTE</button>
+          <button onClick={createRoute}>CREATE ROUTE</button>
         }
         <div id='map'></div>
         <div className='form-container'>
