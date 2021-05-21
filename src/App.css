@@ -68,6 +68,10 @@ input[type=submit]:active, button:active {
   justify-content: flex-end;
 }
 
+.active-option {
+  background-color: #3e3e3e;
+}
+
 .mapboxgl-marker .active-marker {
   display: none;
 }
@@ -78,6 +82,15 @@ input[type=submit]:active, button:active {
 
 .mapboxgl-marker.active .active-marker{
   display: block;
+}
+
+.route-pointer {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #3887be;
+  pointer-events: none;
 }
 
 

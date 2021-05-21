@@ -10,7 +10,7 @@ const App = () => {
 
   const [markerFormTitle, setMarkerFormTitle] = useState("")
   const [markerFormDescription, setMarkerFormDescription] = useState("")
-  const [isRouteLoaded, setIsRouteLoaded] = useState(false)
+  const [activeOption, setActiveOption] = useState('')
   const [map, setMap] = useState(null)
   const [markers, setMarkers] = useState({})
   const [activeMarkerId, setActiveMarkerId] = useState(null)
@@ -23,8 +23,13 @@ const App = () => {
       zoom: 14
     })
 
+    setMap(map)
+    return () => map.remove()
+  }, [])
 
-    map.on('click', function (e) {
+  useEffect(() => {
+    function onMapClickHandler(e) {
+      // Marker pointer element
       const markerEl = document.createElement('div')
       const svgEl1 = document.createElement('img')
       const svgEl2 = document.createElement('img')
@@ -34,8 +39,13 @@ const App = () => {
       svgEl2.src = '/assets/ActiveMarkerIcon.svg'
       markerEl.appendChild(svgEl1)
       markerEl.appendChild(svgEl2)
+      // Route pointer element
+      const routeEl = document.createElement('div')
+      routeEl.classList.add('route-pointer')
 
-      const marker = new mapboxgl.Marker({ element: markerEl })
+      const activeOptionEl = activeOption === 'marker' ? markerEl : routeEl
+
+      const marker = new mapboxgl.Marker({ element: activeOptionEl })
         .setLngLat([e.lngLat.lng, e.lngLat.lat])
         .addTo(map)
       const markerElement = marker.getElement()
@@ -43,8 +53,6 @@ const App = () => {
         // Prevent map click event from triggering
         e.stopPropagation()
         const markerId = e.target.parentNode.getAttribute('data-id')
-        console.log(markerId)
-        console.log(e.target)
         setActiveMarkerId(markerId)
       })
       const markerId = '' + Math.round(Math.random() * 1000) // Save markerId as string for setAttribute
@@ -59,11 +67,12 @@ const App = () => {
           }
         }
       })
-    })
 
-    setMap(map)
-    return () => map.remove()
-  }, [])
+    }
+    if (map) {
+      map.on('click', onMapClickHandler)
+    }
+  }, [activeOption])
 
   useEffect(() => {
     if (activeMarkerId) {
@@ -74,7 +83,6 @@ const App = () => {
       const markerElements = map.getContainer().querySelectorAll('.mapboxgl-marker')
       markerElements.forEach((markerEl) => {
         if (markerEl.getAttribute('data-id') === activeMarkerId) {
-          console.log(markerEl)
           markerEl.classList.add('active')
         } else {
           markerEl.classList.remove('active')
@@ -123,19 +131,30 @@ const App = () => {
   }
 
   const createRoute = () => {
+    setActiveOption('route')
     // Get points on map to create a line
   }
 
   const createMarker = () => {
+    setActiveOption('marker')
     // Get points on map to create a line
   }
 
   return (
     <div className='container'>
+      {console.log(activeOption)}
       <h1>Build your personal route</h1>
       <div>
-        <button onClick={createMarker}>MARKER</button>
-        <button onClick={createRoute}>ROUTE</button>
+        <button
+          className={activeOption === 'marker' && 'active-option'}
+          onClick={createMarker}>
+          MARKER
+          </button>
+        <button
+          className={activeOption === 'route' && 'active-option'}
+          onClick={createRoute}>
+          ROUTE
+          </button>
         <div id='map'></div>
         <div className='form-container'>
           {
