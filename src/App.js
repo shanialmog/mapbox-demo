@@ -46,9 +46,10 @@ const App = () => {
       const activeOptionEl = activeOption === 'marker' ? markerEl : routeEl
 
       if (activeOption === 'marker') {
-        
+
       }
 
+      
       const marker = new mapboxgl.Marker({ element: activeOptionEl })
         .setLngLat([e.lngLat.lng, e.lngLat.lat])
         .addTo(map)
