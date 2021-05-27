@@ -1,10 +1,12 @@
 import mapboxgl from 'mapbox-gl'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 import './App.css'
 
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhbmlhbCIsImEiOiJja255ZGNzeDUxZmNjMm9vYW5sMHJlOGl4In0.4jYO29I1bJmuCg8FxL1rKw'
+
+// Create data-mapbox-marker-id constant
 
 const App = () => {
 
@@ -23,61 +25,69 @@ const App = () => {
       zoom: 14
     })
 
+    map.on('click', onMapClickHandler)
     setMap(map)
     return () => map.remove()
   }, [])
 
-  useEffect(() => {
-    function onMapClickHandler(e) {
-      // Marker pointer element
-      const markerEl = document.createElement('div')
-      const svgEl1 = document.createElement('img')
-      const svgEl2 = document.createElement('img')
-      svgEl1.classList.add('default-marker')
-      svgEl2.classList.add('active-marker')
-      svgEl1.src = '/assets/MarkerIcon.svg'
-      svgEl2.src = '/assets/ActiveMarkerIcon.svg'
-      markerEl.appendChild(svgEl1)
-      markerEl.appendChild(svgEl2)
-      // Route pointer element
-      const routeEl = document.createElement('div')
-      routeEl.classList.add('route-pointer')
-
-      const activeOptionEl = activeOption === 'marker' ? markerEl : routeEl
-
-      if (activeOption === 'marker') {
-
+  const onMapClickHandler = (e) => {
+    setActiveOption(activeOption => {
+      if (!activeOption) {
+        return
       }
-
-      
-      const marker = new mapboxgl.Marker({ element: activeOptionEl })
+      const element = createMarkerElement(activeOption)
+      const marker = new mapboxgl.Marker({ element })
         .setLngLat([e.lngLat.lng, e.lngLat.lat])
-        .addTo(map)
-      const markerElement = marker.getElement()
-      markerElement.addEventListener('click', (e) => {
-        // Prevent map click event from triggering
-        e.stopPropagation()
-        const markerId = e.target.parentNode.getAttribute('data-id')
-        setActiveMarkerId(markerId)
+      setMap(map => {
+        marker.addTo(map)
+        return map
       })
+      const markerElement = marker.getElement()
+      markerElement.addEventListener('click', markerClickHandler)
       const markerId = '' + Math.round(Math.random() * 1000) // Save markerId as string for setAttribute
       markerElement.setAttribute('data-id', markerId)
       setMarkers((prevState) => {
         setActiveMarkerId(markerId)
         return {
-          ...prevState, [markerId]: {
+          ...prevState,
+          [markerId]: {
+            type: activeOption,
             title: '',
             description: '',
             ref: marker // Reference to mapbox marker instance
           }
         }
       })
+      return activeOption
+    })
+  }
 
+  const createMarkerElement = (type) => {
+    const el = document.createElement('div')
+    if (type === 'marker') {
+      const svgEl1 = document.createElement('img')
+      const svgEl2 = document.createElement('img')
+      svgEl1.classList.add('default-marker')
+      svgEl2.classList.add('active-marker')
+      svgEl1.src = '/assets/MarkerIcon.svg'
+      svgEl2.src = '/assets/ActiveMarkerIcon.svg'
+      el.appendChild(svgEl1)
+      el.appendChild(svgEl2)
+    } else if (type === 'route') {
+      el.classList.add('route-pointer')
+    } else {
+      throw new Error(`Unknown marker type: ${type}`)
     }
-    if (map) {
-      map.on('click', onMapClickHandler)
-    }
-  }, [activeOption])
+    return el
+  }
+
+  const markerClickHandler = (e) => {
+    // Prevent map click event from triggering
+    e.stopPropagation()
+    const markerId = e.target.parentNode.getAttribute('data-id')
+    setActiveMarkerId(markerId)
+  }
+
 
   useEffect(() => {
     if (activeMarkerId) {
@@ -147,7 +157,6 @@ const App = () => {
 
   return (
     <div className='container'>
-      {console.log(activeOption)}
       <h1>Build your personal route</h1>
       <div>
         <button
