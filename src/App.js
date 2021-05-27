@@ -13,21 +13,22 @@ const App = () => {
   const [markerFormTitle, setMarkerFormTitle] = useState("")
   const [markerFormDescription, setMarkerFormDescription] = useState("")
   const [activeOption, setActiveOption] = useState('')
-  const [map, setMap] = useState(null)
   const [markers, setMarkers] = useState({})
   const [activeMarkerId, setActiveMarkerId] = useState(null)
+  // Using useRef since Mapbox-GL is not a React component
+  const map = useRef(null)
 
   useEffect(() => {
-    const map = new mapboxgl.Map({
+    const _map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v10',
       center: [34.81900115008375, 32.09872132522804],
       zoom: 14
     })
 
-    map.on('click', onMapClickHandler)
-    setMap(map)
-    return () => map.remove()
+    _map.on('click', onMapClickHandler)
+    map.current = _map
+    return () => _map.remove()
   }, [])
 
   const onMapClickHandler = (e) => {
@@ -38,10 +39,7 @@ const App = () => {
       const element = createMarkerElement(activeOption)
       const marker = new mapboxgl.Marker({ element })
         .setLngLat([e.lngLat.lng, e.lngLat.lat])
-      setMap(map => {
-        marker.addTo(map)
-        return map
-      })
+      marker.addTo(map.current)
       const markerElement = marker.getElement()
       markerElement.addEventListener('click', markerClickHandler)
       const markerId = '' + Math.round(Math.random() * 1000) // Save markerId as string for setAttribute
@@ -94,8 +92,8 @@ const App = () => {
       setMarkerFormTitle(markers[activeMarkerId].title)
       setMarkerFormDescription(markers[activeMarkerId].description)
     }
-    if (map) {
-      const markerElements = map.getContainer().querySelectorAll('.mapboxgl-marker')
+    if (map.current) {
+      const markerElements = map.current.getContainer().querySelectorAll('.mapboxgl-marker')
       markerElements.forEach((markerEl) => {
         if (markerEl.getAttribute('data-id') === activeMarkerId) {
           markerEl.classList.add('active')
