@@ -12,11 +12,12 @@ const App = () => {
 
   const [markerFormTitle, setMarkerFormTitle] = useState("")
   const [markerFormDescription, setMarkerFormDescription] = useState("")
-  const [activeOption, setActiveOption] = useState('')
   const [markers, setMarkers] = useState({})
   const [activeMarkerId, setActiveMarkerId] = useState(null)
   // Using useRef since Mapbox-GL is not a React component
   const map = useRef(null)
+  const [_activeOption, setActiveOption] = useState('')
+  const activeOption = useRef('')
 
   useEffect(() => {
     const _map = new mapboxgl.Map({
@@ -25,18 +26,13 @@ const App = () => {
       center: [34.81900115008375, 32.09872132522804],
       zoom: 14
     })
-
     _map.on('click', onMapClickHandler)
     map.current = _map
     return () => _map.remove()
   }, [])
-
+  
   const onMapClickHandler = (e) => {
-    setActiveOption(activeOption => {
-      if (!activeOption) {
-        return
-      }
-      const element = createMarkerElement(activeOption)
+      const element = createMarkerElement(activeOption.current)
       const marker = new mapboxgl.Marker({ element })
         .setLngLat([e.lngLat.lng, e.lngLat.lat])
       marker.addTo(map.current)
@@ -49,15 +45,13 @@ const App = () => {
         return {
           ...prevState,
           [markerId]: {
-            type: activeOption,
+            type: activeOption.current,
             title: '',
             description: '',
             ref: marker // Reference to mapbox marker instance
           }
         }
       })
-      return activeOption
-    })
   }
 
   const createMarkerElement = (type) => {
@@ -145,11 +139,13 @@ const App = () => {
 
   const createRoute = () => {
     setActiveOption('route')
+    activeOption.current = 'route'
     // Get points on map to create a line
   }
 
   const createMarker = () => {
     setActiveOption('marker')
+    activeOption.current = 'marker'
     // Get points on map to create a line
   }
 
@@ -158,12 +154,12 @@ const App = () => {
       <h1>Build your personal route</h1>
       <div>
         <button
-          className={activeOption === 'marker' && 'active-option'}
+          className={_activeOption === 'marker' ? 'active-option' : null}
           onClick={createMarker}>
           MARKER
           </button>
         <button
-          className={activeOption === 'route' && 'active-option'}
+          className={_activeOption === 'route' ? 'active-option': null}
           onClick={createRoute}>
           ROUTE
           </button>
