@@ -28,30 +28,71 @@ const App = () => {
     })
     _map.on('click', onMapClickHandler)
     map.current = _map
+
+    _map.on('load', () => {
+      addRouteLayer()
+    })
+
     return () => _map.remove()
   }, [])
-  
+
   const onMapClickHandler = (e) => {
-      const element = createMarkerElement(activeOption.current)
-      const marker = new mapboxgl.Marker({ element })
-        .setLngLat([e.lngLat.lng, e.lngLat.lat])
-      marker.addTo(map.current)
-      const markerElement = marker.getElement()
-      markerElement.addEventListener('click', markerClickHandler)
-      const markerId = '' + Math.round(Math.random() * 1000) // Save markerId as string for setAttribute
-      markerElement.setAttribute('data-id', markerId)
-      setMarkers((prevState) => {
-        setActiveMarkerId(markerId)
-        return {
-          ...prevState,
-          [markerId]: {
-            type: activeOption.current,
-            title: '',
-            description: '',
-            ref: marker // Reference to mapbox marker instance
-          }
+    if (activeOption.current === 'route') {
+      addRouteLayerLine(e.lngLat.lng, e.lngLat.lat)
+    }
+    const element = createMarkerElement(activeOption.current)
+    const marker = new mapboxgl.Marker({ element })
+      .setLngLat([e.lngLat.lng, e.lngLat.lat])
+    marker.addTo(map.current)
+    const markerElement = marker.getElement()
+    markerElement.addEventListener('click', markerClickHandler)
+    const markerId = '' + Math.round(Math.random() * 1000) // Save markerId as string for setAttribute
+    markerElement.setAttribute('data-id', markerId)
+    setMarkers((prevState) => {
+      setActiveMarkerId(markerId)
+      return {
+        ...prevState,
+        [markerId]: {
+          type: activeOption.current,
+          title: '',
+          description: '',
+          ref: marker // Reference to mapbox marker instance
         }
-      })
+      }
+    })
+  }
+
+  const addRouteLayer = () => {
+    map.current.addSource('route', {
+      'type': 'geojson',
+      'data': {
+        'type': 'Feature',
+        'properties': {},
+        'geometry': {
+          'type': 'LineString',
+          'coordinates': []
+        }
+      }
+    })
+    map.current.addLayer({
+      'id': 'routeLine',
+      'type': 'line',
+      'source': 'route',
+      'layout': {
+        'line-join': 'round',
+        'line-cap': 'round'
+      },
+      'paint': {
+        'line-color': '#888',
+        'line-width': 8
+      }
+    })
+  }
+  
+  const addRouteLayerLine = (lng, lat) => {
+    const data = map.current.getSource('route')._data
+    data.geometry.coordinates.push([lng, lat])
+    map.current.getSource('route').setData(data)
   }
 
   const createMarkerElement = (type) => {
@@ -159,7 +200,7 @@ const App = () => {
           MARKER
           </button>
         <button
-          className={_activeOption === 'route' ? 'active-option': null}
+          className={_activeOption === 'route' ? 'active-option' : null}
           onClick={createRoute}>
           ROUTE
           </button>
