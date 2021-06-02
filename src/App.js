@@ -88,7 +88,7 @@ const App = () => {
       }
     })
   }
-  
+
   const addRouteLayerLine = (lng, lat) => {
     const data = map.current.getSource('route')._data
     data.geometry.coordinates.push([lng, lat])
@@ -190,8 +190,27 @@ const App = () => {
     // Get points on map to create a line
   }
 
+  const clearRoute = () => {
+    const data = map.current.getSource('route')._data
+    data.geometry.coordinates = []
+    map.current.getSource('route').setData(data)
+
+    Object.keys(markers).forEach((markerId) => {
+      if (markers[markerId].type === 'route') {
+        markers[markerId].ref.remove()
+      }
+    })
+
+    setMarkers((prevState) => {
+      return Object.keys(prevState).filter((markerId) => {
+        return prevState[markerId].type !== 'route'
+      })
+    })
+  }
+
   return (
     <div className='container'>
+      {console.log(markers)}
       <h1>Build your personal route</h1>
       <div>
         <button
@@ -232,6 +251,10 @@ const App = () => {
                 <button onClick={onMarkerDelete}>DELETE</button>
               </div>
             </form>
+          }
+          {
+            _activeOption === 'route' &&
+            <button onClick={clearRoute}>CLEAR ROUTE</button>
           }
         </div>
       </div>
