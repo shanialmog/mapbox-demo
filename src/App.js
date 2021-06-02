@@ -207,7 +207,7 @@ const App = () => {
         <div id='map'></div>
         <div className='form-container'>
           {
-            activeMarkerId &&
+            (activeMarkerId && _activeOption === 'marker') &&
             <form onSubmit={onFormSubmit}>
               <div className="form-group">
                 <label htmlFor="title" className="control-label">Title</label>
