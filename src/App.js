@@ -210,7 +210,6 @@ const App = () => {
 
   return (
     <div className='container'>
-      {console.log(markers)}
       <h1>Build your personal route</h1>
       <div>
         <button
